@@ -1,44 +1,114 @@
-### RTP-2FA Authenticator
+# 🔐 RTP-2FA Authenticator
 
-#### About
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Go Version](https://img.shields.io/badge/Go-1.20+-blue.svg)](https://golang.org/)
+[![Platform](https://img.shields.io/badge/Platform-Linux%20%7C%20macOS%20%7C%20FreeBSD%20%7C%20OpenBSD-lightgrey.svg)](https://github.com/rtwair/rtp-2fa-authenticator)
 
-This is a 2FA Authenticator written in Go with integration functionality in dmenu. It is a simple implementation of the [Google Authenticator](https://github.com/google/google-authenticator/wiki/Key-Uri-Format) specification.
+A lightweight, cross-platform 2FA authenticator written in Go with seamless dmenu integration. Compatible with the [Google Authenticator specification](https://github.com/google/google-authenticator/wiki/Key-Uri-Format).
 
-#### Usage
+## ✨ Features
 
-``` bash
-2FA Authenticator - Usage:
-  go run main.go add <account_name> <secret> [issuer]
-  go run main.go add-url <otpauth_url>
-  go run main.go list
-  go run main.go remove <account_name>
-  go run main.go generate <secret>
-  go run main.go dmenu
-  go run main.go watch
-  go run main.go info
+- 🚀 **Fast & Lightweight** - Written in Go for optimal performance
+- 🔧 **Dmenu Integration** - Quick access through dmenu with hotkey support
+- 🌐 **Cross-Platform** - Works on Linux, macOS, FreeBSD, and OpenBSD
+- 📱 **Google Authenticator Compatible** - Supports standard TOTP tokens
+- 🎯 **Simple CLI Interface** - Easy-to-use command-line operations
+- 📋 **Clipboard Integration** - Automatic copying to X11 clipboard
 
-Examples:
-  go run main.go add "My Account" "JBSWY3DPEHPK3PXP" "MyService"
-  go run main.go add-url "otpauth://totp/MyService:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=MyService"
-  go run main.go list
-  go run main.go generate "JBSWY3DPEHPK3PXP"
-  go run main.go dmenu    # Quick dmenu selection
-  go run main.go info     # Show storage location
+## 🚀 Installation
+
+```bash
+git clone https://github.com/rtwair/rtp-2fa-authenticator.git
+cd rtp-2fa-authenticator
+make
 ```
 
-#### Dmenu Integration
+## 📖 Usage
 
-To add a hotkey to dmenu, add the following to your `config.def.h` file in the respective sections (and recompile dwm):
-``` c
+```bash
+2FA Authenticator - Usage:
+  authenticator add <account_name> <secret> [issuer]
+  authenticator add-url <otpauth_url>
+  authenticator list
+  authenticator remove <account_name>
+  authenticator generate <secret>
+  authenticator dmenu
+  authenticator watch
+  authenticator info
+```
+
+### Examples
+
+```bash
+# Add a new account
+authenticator add "My Account" "JBSWY3DPEHPK3PXP" "MyService"
+
+# Add from OTP URL
+authenticator add-url "otpauth://totp/MyService:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=MyService"
+
+# List all accounts
+authenticator list
+
+# Generate code for a specific secret
+authenticator generate "JBSWY3DPEHPK3PXP"
+
+# Launch dmenu interface
+authenticator dmenu
+
+# Show storage location
+authenticator info
+```
+
+## ⚡ Dmenu Integration
+
+For seamless integration with dwm, add the following to your `config.def.h` file and recompile:
+
+```c
+// Add to command definitions
 static const char *tfacmd[] = { "authenticator", "dmenu", NULL };
 
-    { MODKEY,                       XK_e,      spawn,          {.v = tfacmd } },
+// Add to key bindings
+{ MODKEY, XK_e, spawn, {.v = tfacmd } },
 ```
-The above example uses `MODKEY + e` to open the dmenu authenticator. From there you can fuzzyfind your entries and the 2fa code is copied to your x11 clipboard.
 
+This creates a `MODKEY + e` hotkey that opens the dmenu authenticator. Simply fuzzy-search your entries and the 2FA code will be automatically copied to your X11 clipboard.
 
-#### Questions
+## 🖥️ Compatibility
 
-If you have any questions, please open an issue on [Github](https://github.com/rtwair/rtp-2fa-authenticator/issues) or email me at riyad@rtp.cc.
+Tested and verified on:
+- **Linux** (x86_64, ARM)
+- **macOS** (Intel, Apple Silicon)
+- **FreeBSD**
+- **OpenBSD**
 
-Author: Riyad Twair
+## 🛣️ Roadmap
+
+- [ ] macOS integration improvements
+- [ ] Sketchybar integration
+- [ ] GUI interface
+- [ ] Import/export functionality
+- [ ] Encrypted storage options
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## ❓ Support
+
+If you have any questions or issues:
+- 🐛 [Open an issue on GitHub](https://github.com/rtwair/rtp-2fa-authenticator/issues)
+- 📧 Email: riyad@rtp.cc
+
+## ☕ Support the Project
+
+If you find this project helpful, let me know!
+
+riyad@rtp.cc
+
+---
+
+**Author:** Riyad Twair
