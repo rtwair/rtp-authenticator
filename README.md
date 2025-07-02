@@ -6,7 +6,7 @@ This is a 2FA Authenticator written in Go with integration functionality in dmen
 
 #### Usage
 
-```
+``` bash
 2FA Authenticator - Usage:
   go run main.go add <account_name> <secret> [issuer]
   go run main.go add-url <otpauth_url>
@@ -25,6 +25,17 @@ Examples:
   go run main.go dmenu    # Quick dmenu selection
   go run main.go info     # Show storage location
 ```
+
+#### Dmenu Integration
+
+To add a hotkey to dmenu, add the following to your `config.def.h` file in the respective sections (and recompile dwm):
+``` c
+static const char *tfacmd[] = { "authenticator", "dmenu", NULL };
+
+    { MODKEY,                       XK_e,      spawn,          {.v = tfacmd } },
+```
+The above example uses `MODKEY + e` to open the dmenu authenticator. From there you can fuzzyfind your entries and the 2fa code is copied to your x11 clipboard.
+
 
 #### Questions
 
