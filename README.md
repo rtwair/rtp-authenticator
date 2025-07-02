@@ -1,4 +1,4 @@
-# 🔐 AUTHIE .. THE RTP-2FA Authenticator
+# 🔐 AUTHIE 2FA Authenticator
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/Go-1.20+-blue.svg)](https://golang.org/)
