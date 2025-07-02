@@ -9,22 +9,22 @@ import (
 
 func printUsage() {
 	fmt.Println("2FA Authenticator - Usage:")
-	fmt.Println("  go run main.go add <account_name> <secret> [issuer]")
-	fmt.Println("  go run main.go add-url <otpauth_url>")
-	fmt.Println("  go run main.go list")
-	fmt.Println("  go run main.go remove <account_name>")
-	fmt.Println("  go run main.go generate <secret>")
-	fmt.Println("  go run main.go dmenu")
-	fmt.Println("  go run main.go watch")
-	fmt.Println("  go run main.go info")
+	fmt.Println("  authenticator add <account_name> <secret> [issuer]")
+	fmt.Println("  authenticator add-url <otpauth_url>")
+	fmt.Println("  authenticator list")
+	fmt.Println("  authenticator remove <account_name>")
+	fmt.Println("  authenticator generate <secret>")
+	fmt.Println("  authenticator dmenu")
+	fmt.Println("  authenticator watch")
+	fmt.Println("  authenticator info")
 	fmt.Println()
 	fmt.Println("Examples:")
-	fmt.Println("  go run main.go add \"My Account\" \"JBSWY3DPEHPK3PXP\" \"MyService\"")
-	fmt.Println("  go run main.go add-url \"otpauth://totp/MyService:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=MyService\"")
-	fmt.Println("  go run main.go list")
-	fmt.Println("  go run main.go generate \"JBSWY3DPEHPK3PXP\"")
-	fmt.Println("  go run main.go dmenu    # Quick dmenu selection")
-	fmt.Println("  go run main.go info     # Show storage location")
+	fmt.Println("  authenticator add \"My Account\" \"JBSWY3DPEHPK3PXP\" \"MyService\"")
+	fmt.Println("  authenticator add-url \"otpauth://totp/MyService:user@example.com?secret=JBSWY3DPEHPK3PXP&issuer=MyService\"")
+	fmt.Println("  authenticator list")
+	fmt.Println("  authenticator generate \"JBSWY3DPEHPK3PXP\"")
+	fmt.Println("  authenticator dmenu    # Quick dmenu selection")
+	fmt.Println("  authenticator info     # Show storage location")
 }
 
 func main() {
@@ -54,7 +54,7 @@ func main() {
 
 	case "add":
 		if len(os.Args) < 4 {
-			fmt.Println("Usage: go run main.go add <account_name> <secret> [issuer]")
+			fmt.Println("Usage: authenticator add <account_name> <secret> [issuer]")
 			return
 		}
 
@@ -74,7 +74,7 @@ func main() {
 
 	case "add-url":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: go run main.go add-url <otpauth_url>")
+			fmt.Println("Usage: authenticator add-url <otpauth_url>")
 			return
 		}
 
@@ -96,7 +96,7 @@ func main() {
 
 	case "remove":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: go run main.go remove <account_name>")
+			fmt.Println("Usage: authenticator remove <account_name>")
 			return
 		}
 
@@ -109,7 +109,7 @@ func main() {
 
 	case "generate":
 		if len(os.Args) < 3 {
-			fmt.Println("Usage: go run main.go generate <secret>")
+			fmt.Println("Usage: authenticator generate <secret>")
 			return
 		}
 

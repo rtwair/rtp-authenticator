@@ -3,6 +3,10 @@
 build:
 	go build -o bin/authenticator main.go
 
+install:
+	go build -o bin/authenticator main.go
+	cp bin/authenticator /usr/local/bin/
+
 # Clean build artifacts
 clean:
 	rm -rf bin/
