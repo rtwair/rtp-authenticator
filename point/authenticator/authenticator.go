@@ -214,38 +214,90 @@ func GetTimeRemaining() int {
 
 // CopyToClipboard copies text to system clipboard
 func CopyToClipboard(text string) error {
-	// Try different clipboard commands based on what's available
+	// Detect display server
+	isWayland := os.Getenv("WAYLAND_DISPLAY") != "" || os.Getenv("XDG_SESSION_TYPE") == "wayland"
+
 	var cmd *exec.Cmd
 
-	// Check for xclip (Linux)
-	if _, err := exec.LookPath("xclip"); err == nil {
-		cmd = exec.Command("xclip", "-selection", "clipboard")
-	} else if _, err := exec.LookPath("xsel"); err == nil {
-		// Check for xsel (Linux alternative)
-		cmd = exec.Command("xsel", "--clipboard", "--input")
-	} else if _, err := exec.LookPath("pbcopy"); err == nil {
-		// Check for pbcopy (macOS)
-		cmd = exec.Command("pbcopy")
-	} else if _, err := exec.LookPath("wl-copy"); err == nil {
-		// Check for wl-copy (Wayland)
-		cmd = exec.Command("wl-copy")
+	if isWayland {
+		// Wayland: prefer wl-copy, fallback to X11 tools
+		if _, err := exec.LookPath("wl-copy"); err == nil {
+			cmd = exec.Command("wl-copy")
+		} else if _, err := exec.LookPath("xclip"); err == nil {
+			cmd = exec.Command("xclip", "-selection", "clipboard")
+		} else if _, err := exec.LookPath("xsel"); err == nil {
+			cmd = exec.Command("xsel", "--clipboard", "--input")
+		} else {
+			return fmt.Errorf("no clipboard utility found (install wl-copy, xclip, or xsel)")
+		}
 	} else {
-		return fmt.Errorf("no clipboard utility found (install xclip, xsel, wl-copy, or pbcopy)")
+		// X11: prefer xclip/xsel, fallback to others
+		if _, err := exec.LookPath("xclip"); err == nil {
+			cmd = exec.Command("xclip", "-selection", "clipboard")
+		} else if _, err := exec.LookPath("xsel"); err == nil {
+			cmd = exec.Command("xsel", "--clipboard", "--input")
+		} else if _, err := exec.LookPath("pbcopy"); err == nil {
+			// Check for pbcopy (macOS)
+			cmd = exec.Command("pbcopy")
+		} else if _, err := exec.LookPath("wl-copy"); err == nil {
+			cmd = exec.Command("wl-copy")
+		} else {
+			return fmt.Errorf("no clipboard utility found (install xclip, xsel, wl-copy, or pbcopy)")
+		}
 	}
 
 	cmd.Stdin = strings.NewReader(text)
 	return cmd.Run()
 }
 
-// DmenuSelect shows a dmenu with account options and returns the selected account
+// DmenuSelect shows a menu with account options and returns the selected account
+// Supports dmenu (X11), wofi, rofi, and bemenu (Wayland/universal)
 func (a *Authenticator) DmenuSelect() (*Account, error) {
 	if len(a.Accounts) == 0 {
 		return nil, fmt.Errorf("no Accounts available")
 	}
 
-	// Check if dmenu is available
-	if _, err := exec.LookPath("dmenu"); err != nil {
-		return nil, fmt.Errorf("dmenu not found - please install dmenu")
+	// Detect display server
+	isWayland := os.Getenv("WAYLAND_DISPLAY") != "" || os.Getenv("XDG_SESSION_TYPE") == "wayland"
+
+	// Select menu program based on display server and availability
+	var cmd *exec.Cmd
+	var menuFound bool
+
+	if isWayland {
+		// Wayland: prefer wofi, then bemenu, then rofi, fallback to dmenu
+		if _, err := exec.LookPath("wofi"); err == nil {
+			cmd = exec.Command("wofi", "--dmenu", "--prompt", "Select 2FA Account:")
+			menuFound = true
+		} else if _, err := exec.LookPath("bemenu"); err == nil {
+			cmd = exec.Command("bemenu", "-p", "Select 2FA Account:")
+			menuFound = true
+		} else if _, err := exec.LookPath("rofi"); err == nil {
+			cmd = exec.Command("rofi", "-dmenu", "-p", "Select 2FA Account:")
+			menuFound = true
+		} else if _, err := exec.LookPath("dmenu"); err == nil {
+			cmd = exec.Command("dmenu", "-i", "-p", "Select 2FA Account:")
+			menuFound = true
+		}
+	} else {
+		// X11: prefer dmenu, then rofi, fallback to Wayland options
+		if _, err := exec.LookPath("dmenu"); err == nil {
+			cmd = exec.Command("dmenu", "-i", "-p", "Select 2FA Account:")
+			menuFound = true
+		} else if _, err := exec.LookPath("rofi"); err == nil {
+			cmd = exec.Command("rofi", "-dmenu", "-p", "Select 2FA Account:")
+			menuFound = true
+		} else if _, err := exec.LookPath("wofi"); err == nil {
+			cmd = exec.Command("wofi", "--dmenu", "--prompt", "Select 2FA Account:")
+			menuFound = true
+		} else if _, err := exec.LookPath("bemenu"); err == nil {
+			cmd = exec.Command("bemenu", "-p", "Select 2FA Account:")
+			menuFound = true
+		}
+	}
+
+	if !menuFound {
+		return nil, fmt.Errorf("no menu program found - please install dmenu, wofi, rofi, or bemenu")
 	}
 
 	// Prepare menu options
@@ -259,13 +311,12 @@ func (a *Authenticator) DmenuSelect() (*Account, error) {
 		options = append(options, option)
 	}
 
-	// Run dmenu
-	cmd := exec.Command("dmenu", "-i", "-p", "Select 2FA Account:")
+	// Run the menu
 	cmd.Stdin = strings.NewReader(strings.Join(options, "\n"))
 
 	output, err := cmd.Output()
 	if err != nil {
-		return nil, fmt.Errorf("dmenu selection cancelled or failed: %v", err)
+		return nil, fmt.Errorf("menu selection cancelled or failed: %v", err)
 	}
 
 	selected := strings.TrimSpace(string(output))
@@ -283,7 +334,7 @@ func (a *Authenticator) DmenuSelect() (*Account, error) {
 	return nil, fmt.Errorf("selected account not found")
 }
 
-// DmenuGetCode shows dmenu for account selection and copies code to clipboard
+// DmenuGetCode shows menu for account selection and copies code to clipboard
 func (a *Authenticator) DmenuGetCode() error {
 	account, err := a.DmenuSelect()
 	if err != nil {
