@@ -187,7 +187,7 @@ func GenerateTOTP(secret string, timeStep int64) (string, error) {
 	}
 
 	// Calculate the time counter (30-second intervals)
-	counter := time.Now().Unix() / timeStep
+	counter := time.Now().UTC().Unix() / timeStep
 
 	// Convert counter to 8-byte big-endian
 	counterBytes := make([]byte, 8)
@@ -209,7 +209,7 @@ func GenerateTOTP(secret string, timeStep int64) (string, error) {
 
 // GetTimeRemaining returns seconds until next code generation
 func GetTimeRemaining() int {
-	return 30 - int(time.Now().Unix()%30)
+	return 30 - int(time.Now().UTC().Unix()%30)
 }
 
 // CopyToClipboard copies text to system clipboard
